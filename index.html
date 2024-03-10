@@ -34,7 +34,7 @@
     var ctx = canvas.getContext('2d');
 
     // Ball with bouncing motion
-    var bouncingBall = {
+    var sun = {
         x: 100,
         y: 100,
         radius: 20,
@@ -44,10 +44,10 @@
     };
 
     // Ball that follows the cursor
-    var cursorBall = {
+    var moon = {
         x: canvas.width / 2,
         y: canvas.height / 2,
-        radius: 20,
+        radius: 21,
         color: 'black'
     };
 
@@ -61,15 +61,15 @@
 
     function update() {
         // Update bouncing ball position
-        bouncingBall.x += bouncingBall.dx;
-        bouncingBall.y += bouncingBall.dy;
+        //sun.x += sun.dx;
+        //sun.y += sun.dy;
 
         // Check for collision with walls
-        if (bouncingBall.x + bouncingBall.radius > canvas.width || bouncingBall.x - bouncingBall.radius < 0) {
-            bouncingBall.dx *= -1;
+        if (sun.x + sun.radius > canvas.width || sun.x - sun.radius < 0) {
+            sun.dx *= -1;
         }
-        if (bouncingBall.y + bouncingBall.radius > canvas.height || bouncingBall.y - bouncingBall.radius < 0) {
-            bouncingBall.dy *= -1;
+        if (sun.y + sun.radius > canvas.height || sun.y - sun.radius < 0) {
+            sun.dy *= -1;
         }
 
         // Clear canvas
@@ -80,40 +80,42 @@
 
 
         var coveragePercentage = calculateCoveragePercentage();
-        perc.innerHTML = `Percentage: ${coveragePercentage}`;
-        console.log("Percentage of bouncing circle covered by blue circle: " + coveragePercentage.toFixed(2) + "%");
+        //perc.innerHTML = `Percentage: ${coveragePercentage}`;
+        //console.log("Percentage of bouncing circle covered by blue circle: " + coveragePercentage.toFixed(2) + "%");
 
         var gradient = 255*(1-coveragePercentage/100);
         ctx.fillStyle = `rgb(${205*(1-coveragePercentage/100)},${240*(1-coveragePercentage/100)},${255*(1-coveragePercentage/100)})`;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        drawBall(bouncingBall);
-        // Draw cursor ball
-        drawBall(cursorBall);
+        drawBall(sun);
+        // Draw moon
+        drawBall(moon);
+
+        if(coveragePercentage == 100){
+            nextLevel();
+        }
 
         requestAnimationFrame(update);
     }
 
     function calculateCoveragePercentage() {
         // Calculate distance between the centers of the circles
-        var distance = Math.sqrt(Math.pow(cursorBall.x - bouncingBall.x, 2) + Math.pow(cursorBall.y - bouncingBall.y, 2));
-
+        var distance = Math.sqrt(Math.pow(moon.x - sun.x, 2) + Math.pow(moon.y - sun.y, 2));
+        perc.innerHTML = `Distance: ${distance}`;
         // Check if circles intersect
-        if (distance < cursorBall.radius + bouncingBall.radius && distance > 0) {
+        if (distance < moon.radius + sun.radius && distance > 0.8) {
             // Calculate area of intersection
-            let r1 = bouncingBall.radius;
-            let r2 = cursorBall.radius;
+            let r1 = sun.radius;
+            let r2 = moon.radius;
             let d1 = (distance ** 2 - r1 ** 2 + r2 ** 2)/(2*distance);
             let d2 = distance - d1;
-            var d = Math.min(cursorBall.radius + bouncingBall.radius - distance, bouncingBall.radius);
-            let chord = Math.sqrt((-distance + r1 + r2)*(distance+r1-r2)*(d-r1+r2)*(d+r1+r2));
+            let d = Math.min(moon.radius + sun.radius - distance, sun.radius);
+            let chord = Math.sqrt((-distance + r1 + r2)*(distance+r1-r2)*(distance-r1+r2)*(distance+r1+r2));
             let area = r1 ** 2 * Math.acos(d2/r1)+r2 ** 2 * Math.acos(d1/r2) - 0.5 * chord;
-            var intersectionArea = Math.pow(bouncingBall.radius, 2) * Math.acos((d / bouncingBall.radius)) - d * Math.sqrt(Math.pow(bouncingBall.radius, 2) - Math.pow(d, 2));
-
             // Calculate percentage of bouncing ball covered by the blue ball
-            var bouncingBallArea = Math.PI * Math.pow(bouncingBall.radius, 2);
-            var coveragePercentage = (area / bouncingBallArea) * 100;
+            let sunArea = Math.PI * Math.pow(sun.radius, 2);
+            let coveragePercentage = (area / sunArea) * 100;
             return coveragePercentage;
-        } else if (distance == 0) {
+        } else if (distance < 0.8) {
             return 100;
         }
         else{
@@ -124,20 +126,33 @@
     // Event listener for mouse movement
     canvas.addEventListener('mousemove', function(event) {
         // Get the mouse position relative to the canvas
-        var rect = canvas.getBoundingClientRect();
-        cursorBall.x = event.clientX - rect.left;
-        cursorBall.y = event.clientY - rect.top;
+        let rect = canvas.getBoundingClientRect();
+        moon.x = event.clientX - rect.left;
+        moon.y = event.clientY - rect.top;
     });
 
     canvas.addEventListener('touchmove', function(event){
-        var rect = canvas.getBoundingClientRect();
-        var touch = event.touches[0];
-        cursorBall.x = touch.clientX - rect.left;
-        cursorBall.y = touch.clientY - rect.top;
+        let rect = canvas.getBoundingClientRect();
+        let touch = event.touches[0];
+        moon.x = touch.clientX - rect.left;
+        moon.y = touch.clientY - rect.top;
     });
 
     // Start animation loop
     update();
+
+    function nextLevel(){
+        let minX = 0 + sun.radius; // Ensure the circle doesn't go off the left end
+        let maxX = canvas.width - sun.radius;   // Ensure the circle doesn't go off the right end
+        let randomX = minX + Math.random() * (maxX - minX);
+
+        let minY = 0 + sun.radius; // Ensure the circle doesn't go off the left end
+        let maxY = canvas.height - sun.radius;   // Ensure the circle doesn't go off the right end
+        var randomY = minY + Math.random() * (maxY - minY);
+
+        sun.x = randomX;
+        sun.y = randomY;
+    }
 </script>
 
 </body>

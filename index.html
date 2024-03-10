@@ -15,14 +15,21 @@
         margin: auto;
         background-color: #f0f0f0;
     }
+    .percentage{
+        position: absolute;
+        color: blue;
+        top: 50%;
+        left: 50%;
+    }
 </style>
 </head>
 <body>
 
 <canvas id="myCanvas" width="600" height="400"></canvas>
-
+<div class="percentage" id="percentage"></div>
 <script>
     var canvas = document.getElementById('myCanvas');
+    var perc = document.getElementById('percentage');
     var ctx = canvas.getContext('2d');
 
     // Ball with bouncing motion
@@ -65,16 +72,18 @@
         }
 
         // Clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgb(205,240,255)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Draw bouncing ball
 
 
         var coveragePercentage = calculateCoveragePercentage();
+        perc.innerHTML = `Percentage: ${coveragePercentage}`;
         console.log("Percentage of bouncing circle covered by blue circle: " + coveragePercentage.toFixed(2) + "%");
 
         var gradient = 255*(1-coveragePercentage/100);
-        ctx.fillStyle = `rgb(${gradient},${gradient},${gradient})`;
+        ctx.fillStyle = `rgb(${205*(1-coveragePercentage/100)},${240*(1-coveragePercentage/100)},${255*(1-coveragePercentage/100)})`;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         drawBall(bouncingBall);
         // Draw cursor ball
@@ -88,17 +97,25 @@
         var distance = Math.sqrt(Math.pow(cursorBall.x - bouncingBall.x, 2) + Math.pow(cursorBall.y - bouncingBall.y, 2));
 
         // Check if circles intersect
-        if (distance <= cursorBall.radius + bouncingBall.radius) {
+        if (distance < cursorBall.radius + bouncingBall.radius && distance > 0) {
             // Calculate area of intersection
+            let r1 = bouncingBall.radius;
+            let r2 = cursorBall.radius;
+            let d1 = (distance ** 2 - r1 ** 2 + r2 ** 2)/(2*distance);
+            let d2 = distance - d1;
             var d = Math.min(cursorBall.radius + bouncingBall.radius - distance, bouncingBall.radius);
+            let chord = Math.sqrt((-distance + r1 + r2)*(distance+r1-r2)*(d-r1+r2)*(d+r1+r2));
+            let area = r1 ** 2 * Math.acos(d2/r1)+r2 ** 2 * Math.acos(d1/r2) - 0.5 * chord;
             var intersectionArea = Math.pow(bouncingBall.radius, 2) * Math.acos((d / bouncingBall.radius)) - d * Math.sqrt(Math.pow(bouncingBall.radius, 2) - Math.pow(d, 2));
 
             // Calculate percentage of bouncing ball covered by the blue ball
             var bouncingBallArea = Math.PI * Math.pow(bouncingBall.radius, 2);
-            var coveragePercentage = (intersectionArea / bouncingBallArea) * 100;
-
+            var coveragePercentage = (area / bouncingBallArea) * 100;
             return coveragePercentage;
-        } else {
+        } else if (distance == 0) {
+            return 100;
+        }
+        else{
             return 0; // No overlap
         }
     }

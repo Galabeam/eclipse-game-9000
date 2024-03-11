@@ -15,7 +15,7 @@
     // Default CSS styles. If you don't specify your own CSS or discrete color options, this is what gets used.
     // 
     $("<style type='text/css'>" 
-        + "." + c_sClassSvg + "{fill: #320000; overflow: visible; stroke-width: 0; height: 100%; width: 100%; margin: 10px; background-color: transparent}"
+        + "." + c_sClassSvg + "{fill: #320000; overflow: visible; stroke-width: 0; height: 100%; width: 100%; background-color: transparent}"
         + "." + c_sClassSegOn + "{fill: Lime}"
         + "</style>")
         .prependTo("head");

@@ -32,16 +32,33 @@
         top: 50%;
         left: 50%;
         pointer-events: none;
+        visibility: hidden;
     }
     #testResizableArray{
         position:sticky;
         margin-top: 10px;
-        bottom: 20%;
         left: 50%;
         width: 300px;
         transform: translate(-50%,0%);
         pointer-events: none;
+    }
+    #points{
+        position:sticky;
+        margin-top: 10px;
+        left: 50%;
+        width: 100px;
+        transform: translate(-50%,0%);
+        pointer-events: none;
 
+    }
+    .distanceZone{
+        position: absolute;
+        color: yellow;
+        top: 60%;
+        left: 50%;
+        pointer-events: none; 
+        z-index: 2;
+        visibility: hidden;
     }
 </style>
 </head>
@@ -49,14 +66,37 @@
 
 <canvas id="myCanvas" width="600" height="400"></canvas>
 <div class="percentage" id="percentage"></div>
+<div class="distanceZone" id="distanceZone"></div>
 <div id="testResizableArray"></div>
+<div id="points"></div>
 <script>
     var canvas = document.getElementById('myCanvas');
-    var perc = document.getElementById('percentage');
+    var distanceSpot = document.getElementById('percentage');
+    var coverSpot = document.getElementById('distanceZone');
     var ctx = canvas.getContext('2d');
     var timer = new Date();
     var now = new Date();
     var secondsElapsed = now.getSeconds() - timer.getSeconds();
+    var points = 0;
+    var nextLevelYes = false;
+    $("#points").sevenSeg({ value: points, digits: 2, slant: 0, decimalPoint: true });
+
+
+    var aspectRatio, width, height;
+    var image = new Image();
+    image.src = 'success.png'; // Replace 'image.png' with the path to your image
+    image.onload = function(){
+        aspectRatio = image.width / image.height;
+        if (aspectRatio > 1) {
+            width = 120;
+            height = width / aspectRatio;
+        } else {
+            height = 120;
+            width = height * aspectRatio;
+        }
+        update();
+    }
+
     // Ball with bouncing motion
     var sun = {
         x: 100,
@@ -98,25 +138,29 @@
         }
 
         // Clear canvas
-        ctx.fillStyle = "rgb(205,240,255)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+        if(!nextLevelYes){
+            ctx.fillStyle = "rgb(205,240,255)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
         // Draw bouncing ball
 
 
         var coveragePercentage = calculateCoveragePercentage();
-        //perc.innerHTML = `Percentage: ${coveragePercentage}`;
-        //console.log("Percentage of bouncing circle covered by blue circle: " + coveragePercentage.toFixed(2) + "%");
 
         var gradient = 255*(1-coveragePercentage/100);
-        ctx.fillStyle = `rgb(${205*(1-coveragePercentage/100)},${240*(1-coveragePercentage/100)},${255*(1-coveragePercentage/100)})`;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        drawBall(sun);
-        // Draw moon
-        drawBall(moon);
-
+        if(!nextLevelYes){
+            ctx.fillStyle = `rgb(${205*(1-coveragePercentage/100)},${240*(1-coveragePercentage/100)},${255*(1-coveragePercentage/100)})`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            drawBall(sun);
+            drawBall(moon);
+        }
         if(coveragePercentage == 100){
-            nextLevel();
+            if(!nextLevelYes){
+                drawImageAtCursor(moon.x,moon.y);
+                nextLevelYes = true;
+                setTimeout(nextLevel,1000);
+            }
         }
         secondsElapsed = (now - timer)/1000;
         $("#testResizableArray").sevenSeg({ value: secondsElapsed.toFixed(1), digits: 6, slant: 0, decimalPoint: true });
@@ -126,27 +170,46 @@
     function calculateCoveragePercentage() {
         // Calculate distance between the centers of the circles
         var distance = Math.sqrt(Math.pow(moon.x - sun.x, 2) + Math.pow(moon.y - sun.y, 2));
-        perc.innerHTML = `Distance: ${distance} and ${moon.radius} and ${sun.radius}`;
+        distanceSpot.innerHTML = `Distance: ${distance} and ${moon.radius} and ${sun.radius}`;
         // Check if circles intersect
-        if (distance < moon.radius + sun.radius && distance > 1.4) {
+        let minDist = 1.4;
+        if (distance < moon.radius + sun.radius && distance > minDist) {
             // Calculate area of intersection
             let r1 = sun.radius;
             let r2 = moon.radius;
             let d1 = (distance ** 2 - r1 ** 2 + r2 ** 2)/(2*distance);
             let d2 = distance - d1;
-            let d = Math.min(moon.radius + sun.radius - distance, sun.radius);
+            //console.log("d1" + d1 + " d2 " + d2);
             let chord = Math.sqrt((-1*distance + r1 + r2)*(distance+r1-r2)*(distance-r1+r2)*(distance+r1+r2));
-            let area = (r1 ** 2) * Math.acos(d2/r1)+(r2 ** 2) * Math.acos(d1/r2) - 0.5 * chord;
+            if(isNaN(chord)){chord = 0;}
+            //console.log("chord: " + chord);
+            let fraction1 = d1/r2;
+            let fraction2 = d2/r1;
+            if(fraction1 > 1){ fraction1 = 1;}
+            if(fraction2 > 1){ fraction2 = 1;}
+            if(fraction1 < -1){ fraction1 = -1;}
+            if(fraction2 < -1){ fraction2 = -1;}
+            let area = (r1 ** 2) * Math.acos(fraction2)+(r2 ** 2) * Math.acos(fraction1) - 0.5 * chord;
+            //console.log(d1/r2 + " d1/r2 and " + d2/r1 + " d2/r1");
+
+            //console.log(Math.acos(fraction2)+ " first acos and second acos: " + Math.acos(d1/r2) + " and r1 ^ 2: " + r1 ** 2 + " and r2^2: " + r2**2);
+            //console.log("Area: " + area);
             // Calculate percentage of bouncing ball covered by the blue ball
             let sunArea = Math.PI * Math.pow(sun.radius, 2);
             let coveragePercentage = (area / sunArea) * 100;
+            coverSpot.innerHTML = `Coverage = ${coveragePercentage}`;
             return coveragePercentage;
-        } else if (distance < 0.8) {
+        } else if (distance < minDist) {
             return 100;
         }
         else{
             return 0; // No overlap
         }
+    }
+
+    function drawImageAtCursor(x, y) {
+        ctx.drawImage(image, x - width / 2, y - height / 2, width, height);
+        console.log(width + " width " + height + " height");
     }
 
     // Event listener for mouse movement
@@ -165,19 +228,32 @@
     });
 
     // Start animation loop
-    update();
+   
 
     function nextLevel(){
-        let minX = 0 + sun.radius; // Ensure the circle doesn't go off the left end
-        let maxX = canvas.width - sun.radius;   // Ensure the circle doesn't go off the right end
-        let randomX = minX + Math.random() * (maxX - minX);
-
-        let minY = 0 + sun.radius; // Ensure the circle doesn't go off the left end
-        let maxY = canvas.height - sun.radius;   // Ensure the circle doesn't go off the right end
-        var randomY = minY + Math.random() * (maxY - minY);
-
-        sun.x = randomX;
-        sun.y = randomY;
+        
+        console.log("WHY "+points);
+        if(nextLevelYes){
+            points++;
+            let prevX = sun.x;
+            let prevY = sun.y;
+            let minX = 0 + sun.radius; // Ensure the circle doesn't go off the left end
+            let maxX = canvas.width - sun.radius;   // Ensure the circle doesn't go off the right end   
+            let minY = 0 + sun.radius; // Ensure the circle doesn't go off the left end
+            let maxY = canvas.height - sun.radius;   // Ensure the circle doesn't go off the right end
+            let randomX = prevX;
+            while(Math.abs(prevX - randomX) < sun.radius){
+                randomX = minX + Math.random() * (maxX - minX);
+            }
+            let randomY = prevY;
+            while(Math.abs(prevY-randomY)<sun.radius){
+                randomY = minY + Math.random() * (maxY - minY);
+            }
+            sun.x = randomX;
+            sun.y = randomY;
+            $("#points").sevenSeg({ value: points, digits: 3, slant: 0, decimalPoint: true });
+        }
+        nextLevelYes = false;
     }
 
     $(function () {
@@ -199,7 +275,7 @@
     //$("#testResizableDiv").resizable({aspectRatio: true});
     //$("#testSegInsideResizable").sevenSeg({value: 8});
 
-    $("#testResizableArray").sevenSeg({ digits: 4, slant: 10, decimalPoint: true });
+    $("#testResizableArray").sevenSeg({ digits: 4, slant: 0, decimalPoint: true });
     //$("#testResizableDiv2").resizable({aspectRatio: true});
     // $("#testArray1").sevenSeg({
 	// 	digits:5, 

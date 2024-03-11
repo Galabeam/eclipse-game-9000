@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="//fonts.googleapis.com/css?family=Iceberg" rel="stylesheet">
+<link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/ui-darkness/jquery-ui.css" rel="stylesheet">   
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script src="//ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
+
+<script src="sevenseg.js"></script>
 <title>Bouncing Balls</title>
 <style>
     body, html {
@@ -10,17 +18,30 @@
         padding: 0;
         height: 100%;
         overscroll-behavior: none;
+        background-color: black;
     }
     canvas {
         display: block;
         margin: auto;
         background-color: #f0f0f0;
+        cursor:crosshair;
     }
     .percentage{
         position: absolute;
         color: blue;
         top: 50%;
         left: 50%;
+        pointer-events: none;
+    }
+    #testResizableArray{
+        position:sticky;
+        margin-top: 10px;
+        bottom: 20%;
+        left: 50%;
+        width: 300px;
+        transform: translate(-50%,0%);
+        pointer-events: none;
+
     }
 </style>
 </head>
@@ -28,11 +49,14 @@
 
 <canvas id="myCanvas" width="600" height="400"></canvas>
 <div class="percentage" id="percentage"></div>
+<div id="testResizableArray"></div>
 <script>
     var canvas = document.getElementById('myCanvas');
     var perc = document.getElementById('percentage');
     var ctx = canvas.getContext('2d');
-
+    var timer = new Date();
+    var now = new Date();
+    var secondsElapsed = now.getSeconds() - timer.getSeconds();
     // Ball with bouncing motion
     var sun = {
         x: 100,
@@ -47,7 +71,7 @@
     var moon = {
         x: canvas.width / 2,
         y: canvas.height / 2,
-        radius: 21,
+        radius: 22,
         color: 'black'
     };
 
@@ -60,6 +84,7 @@
     }
 
     function update() {
+        now = new Date();
         // Update bouncing ball position
         //sun.x += sun.dx;
         //sun.y += sun.dy;
@@ -93,24 +118,25 @@
         if(coveragePercentage == 100){
             nextLevel();
         }
-
+        secondsElapsed = (now - timer)/1000;
+        $("#testResizableArray").sevenSeg({ value: secondsElapsed.toFixed(1), digits: 6, slant: 0, decimalPoint: true });
         requestAnimationFrame(update);
     }
 
     function calculateCoveragePercentage() {
         // Calculate distance between the centers of the circles
         var distance = Math.sqrt(Math.pow(moon.x - sun.x, 2) + Math.pow(moon.y - sun.y, 2));
-        perc.innerHTML = `Distance: ${distance}`;
+        perc.innerHTML = `Distance: ${distance} and ${moon.radius} and ${sun.radius}`;
         // Check if circles intersect
-        if (distance < moon.radius + sun.radius && distance > 0.8) {
+        if (distance < moon.radius + sun.radius && distance > 1.4) {
             // Calculate area of intersection
             let r1 = sun.radius;
             let r2 = moon.radius;
             let d1 = (distance ** 2 - r1 ** 2 + r2 ** 2)/(2*distance);
             let d2 = distance - d1;
             let d = Math.min(moon.radius + sun.radius - distance, sun.radius);
-            let chord = Math.sqrt((-distance + r1 + r2)*(distance+r1-r2)*(distance-r1+r2)*(distance+r1+r2));
-            let area = r1 ** 2 * Math.acos(d2/r1)+r2 ** 2 * Math.acos(d1/r2) - 0.5 * chord;
+            let chord = Math.sqrt((-1*distance + r1 + r2)*(distance+r1-r2)*(distance-r1+r2)*(distance+r1+r2));
+            let area = (r1 ** 2) * Math.acos(d2/r1)+(r2 ** 2) * Math.acos(d1/r2) - 0.5 * chord;
             // Calculate percentage of bouncing ball covered by the blue ball
             let sunArea = Math.PI * Math.pow(sun.radius, 2);
             let coveragePercentage = (area / sunArea) * 100;
@@ -153,6 +179,47 @@
         sun.x = randomX;
         sun.y = randomY;
     }
+
+    $(function () {
+    var viewModel = {
+        mainExampleValue: ko.observable(-5.234),
+        testValue1: ko.observable(-12.4),
+        testValue2: ko.observable(9876)
+    };
+    ko.applyBindings(viewModel);
+
+    //$("#exampleSingle").sevenSeg({ value: 5 });
+    //$("#exampleArray").sevenSeg({ digits: 5, value: 12.35 });
+
+    // setInterval(function() {
+    //     var value = +viewModel.mainExampleValue() + 0.001;
+    //     viewModel.mainExampleValue(value.toFixed(3));
+    // }, 100);
+
+    //$("#testResizableDiv").resizable({aspectRatio: true});
+    //$("#testSegInsideResizable").sevenSeg({value: 8});
+
+    $("#testResizableArray").sevenSeg({ digits: 4, slant: 10, decimalPoint: true });
+    //$("#testResizableDiv2").resizable({aspectRatio: true});
+    // $("#testArray1").sevenSeg({
+	// 	digits:5, 
+	// 	value:-98.76, 
+	// 	colorOff: "#003200", 
+	// 	colorOn: "Lime", 
+	// 	slant: 10
+	// });
+    
+    // $("#btnCreate").click(function() {
+    //     $("#testArray2").sevenSeg({digits:4, value:12.34});
+    // });
+
+    // $("#btnDestroy").click(function() {
+    //     $("#testArray2").sevenSeg("destroy");
+    // });
+
+    window.prettyPrint && prettyPrint();
+});
+
 </script>
 
 </body>

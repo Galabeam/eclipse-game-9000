@@ -77,19 +77,19 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         // Draw bouncing ball
 
-        var coveragePercentage = calculateCoveragePercentage();
+        var coPe = calculateCoveragePercentage();
 
-        var gradient = 255 * (1 - coveragePercentage / 100);
+        var gradient = 255 * (1 - coPe / 100);
         if (!nextLevelYes) {
-            ctx.fillStyle = `rgb(${205 * (1 - coveragePercentage / 100)},${
-                240 * (1 - coveragePercentage / 100)
-            },${255 * (1 - coveragePercentage / 100)})`;
+            ctx.fillStyle = `rgb(${205 * (1 - coPe / 100)},${
+                240 * (1 - coPe / 100)
+            },${255 * (1 - coPe / 100)})`;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             drawBall(sun);
             drawBall(moon);
         }
-        if (coveragePercentage == 100) {
+        if (coPe >= 49 && coPe <= 51) {
             if (!nextLevelYes) {
                 drawImageAtCursor(moon.x, moon.y);
                 nextLevelYes = true;
@@ -155,11 +155,11 @@ document.addEventListener("DOMContentLoaded", function () {
             //console.log("Area: " + area);
             // Calculate percentage of bouncing ball covered by the blue ball
             let sunArea = Math.PI * Math.pow(sun.radius, 2);
-            let coveragePercentage = (area / sunArea) * 100;
-            coverSpot.innerHTML = `Coverage = ${coveragePercentage}`;
-            return coveragePercentage;
+            let coPe = (area / sunArea) * 100;
+            coverSpot.innerHTML = `Coverage = ${coPe}`;
+            return coPe;
         } else if (distance < minDist) {
-            return 100;
+            return minDist * 71.4285714 / distance;
         } else {
             return 0; // No overlap
         }
@@ -175,14 +175,14 @@ document.addEventListener("DOMContentLoaded", function () {
         // Get the mouse position relative to the canvas
         let rect = canvas.getBoundingClientRect();
         moon.x = event.clientX - rect.left;
-        moon.y = event.clientY - rect.top - (window.innerHeight * 0.1); // window.innerHeight * 0.1 = 10vh
+        moon.y = event.clientY - rect.top - (window.innerHeight * 0.05); // window.innerHeight * 0.05 = 5vh
     });
 
     canvas.addEventListener("touchmove", function (event) {
         let rect = canvas.getBoundingClientRect();
         let touch = event.touches[0];
         moon.x = touch.clientX - rect.left;
-        moon.y = touch.clientY - rect.top - (window.innerHeight * 0.1); // window.innerHeight * 0.1 = 10vh
+        moon.y = touch.clientY - rect.top - (window.innerHeight * 0.05); // window.innerHeight * 0.05 = 5vh
     });
 
     // Start animation loop

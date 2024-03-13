@@ -6,7 +6,7 @@ body, html {
     background-color: black;
 }
 canvas {
-    padding-top: 10vh;
+    padding-top: 5vh;
     display: block;
     margin: auto;
     background-color: #000;
@@ -29,7 +29,7 @@ canvas {
     pointer-events: none;
 }
 .sevenSeg-svg {
-    fill: #001600;
+    fill: #003300;
 }
 #points {
     position: sticky;

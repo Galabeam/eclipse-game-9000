@@ -59,3 +59,10 @@ canvas {
     font-family: "DSEG7 Classic";
     text-align: center;
 }
+#legal {
+    position: absolute;
+    bottom: 0;
+    left: 1%;
+    color: white;
+    font-family: "Roboto";
+}

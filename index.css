@@ -1,0 +1,50 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overscroll-behavior: none;
+    background-color: black;
+}
+canvas {
+    padding-top: 10vh;
+    display: block;
+    margin: auto;
+    background-color: #000;
+    cursor: crosshair;
+}
+.percentage {
+    position: absolute;
+    color: blue;
+    top: 50%;
+    left: 50%;
+    pointer-events: none;
+    visibility: hidden;
+}
+#testResizableArray {
+    position: sticky;
+    margin-top: 10px;
+    left: 50%;
+    width: 300px;
+    transform: translate(-50%, 0%);
+    pointer-events: none;
+}
+.sevenSeg-svg {
+    fill: #001600;
+}
+#points {
+    position: sticky;
+    margin-top: 10px;
+    left: 50%;
+    width: 100px;
+    transform: translate(-50%, 0%);
+    pointer-events: none;
+}
+.distanceZone {
+    position: absolute;
+    color: yellow;
+    top: 60%;
+    left: 50%;
+    pointer-events: none;
+    z-index: 2;
+    visibility: hidden;
+}

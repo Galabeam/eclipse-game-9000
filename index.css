@@ -1,9 +1,15 @@
+/* fonts */
+@font-face {
+    font-family: "DSEG7 Classic";
+    src: url(font/DSEG7\ Classic.ttf);
+}
+
 body, html {
     margin: 0;
     padding: 0;
     height: 100%;
     overscroll-behavior: none;
-    background-color: black;
+    background-image: url(stars.jpg);
 }
 canvas {
     padding-top: 5vh;
@@ -47,4 +53,9 @@ canvas {
     pointer-events: none;
     z-index: 2;
     visibility: hidden;
+}
+#testdist {
+    color: white;
+    font-family: "DSEG7 Classic";
+    text-align: center;
 }

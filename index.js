@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
             drawBall(sun);
             drawBall(moon);
         }
-        if (coPe >= 49 && coPe <= 51) {
+        if (coPe >= 99 ) {
             if (!nextLevelYes) {
                 drawImageAtCursor(moon.x, moon.y);
                 nextLevelYes = true;
@@ -103,6 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
             slant: 0,
             decimalPoint: true,
         });
+        document.getElementById('testdistcount').innerHTML = Math.round(calculateCoveragePercentage());
         requestAnimationFrame(update);
     }
 

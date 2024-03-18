@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
             drawBall(sun);
             drawBall(moon);
         }
-        if (coPe >= 99 ) {
+        if (coPe >= 100 ) {
             if (!nextLevelYes) {
                 drawImageAtCursor(moon.x, moon.y);
                 nextLevelYes = true;

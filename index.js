@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var aspectRatio, width, height;
     var image = new Image();
-    image.src = "success.png"; // Replace 'image.png' with the path to your image
+    image.src = "image/success.png"; // Replace 'image.png' with the path to your image
     image.onload = function () {
         aspectRatio = image.width / image.height;
         if (aspectRatio > 1) {

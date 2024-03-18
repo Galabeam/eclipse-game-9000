@@ -9,7 +9,7 @@ body, html {
     padding: 0;
     height: 100%;
     overscroll-behavior: none;
-    background-image: url(stars.jpg);
+    background-image: url(image/stars.jpg);
 }
 canvas {
     padding-top: 5vh;

@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         var gradient = 255 * (1 - coPe / 100);
         if (!nextLevelYes) {
-            ctx.fillStyle = `rgb(${205 * (1 - coPe / 100)},${
+            ctx.fillStyle = `rgba(${205 * (1 - coPe / 100)},${
                 240 * (1 - coPe / 100)
             },${255 * (1 - coPe / 100)})`;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -103,7 +103,9 @@ document.addEventListener("DOMContentLoaded", function () {
             slant: 0,
             decimalPoint: true,
         });
-        document.getElementById('testdistcount').innerHTML = Math.round(calculateCoveragePercentage());
+        if (calculateCoveragePercentage() <= 100 && nextLevelYes == false) {
+            document.getElementById('testdistcount').innerHTML = Math.round(calculateCoveragePercentage());
+        }
         requestAnimationFrame(update);
     }
 
@@ -112,7 +114,6 @@ document.addEventListener("DOMContentLoaded", function () {
         var distance = Math.sqrt(
             Math.pow(moon.x - sun.x, 2) + Math.pow(moon.y - sun.y, 2)
         );
-        distanceSpot.innerHTML = `Distance: ${distance} and ${moon.radius} and ${sun.radius}`;
         // Check if circles intersect
         let minDist = 1.4;
         if (distance < moon.radius + sun.radius && distance > minDist) {
@@ -157,7 +158,6 @@ document.addEventListener("DOMContentLoaded", function () {
             // Calculate percentage of bouncing ball covered by the blue ball
             let sunArea = Math.PI * Math.pow(sun.radius, 2);
             let coPe = (area / sunArea) * 100;
-            coverSpot.innerHTML = `Coverage = ${coPe}`;
             return coPe;
         } else if (distance < minDist) {
             return minDist * 71.4285714 / distance;

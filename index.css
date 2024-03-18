@@ -18,15 +18,7 @@ canvas {
     background-color: #000;
     cursor: crosshair;
 }
-.percentage {
-    position: absolute;
-    color: blue;
-    top: 50%;
-    left: 50%;
-    pointer-events: none;
-    visibility: hidden;
-}
-#testResizableArray {
+#timer {
     position: sticky;
     margin-top: 10px;
     left: 50%;
@@ -45,16 +37,7 @@ canvas {
     transform: translate(-50%, 0%);
     pointer-events: none;
 }
-.distanceZone {
-    position: absolute;
-    color: yellow;
-    top: 60%;
-    left: 50%;
-    pointer-events: none;
-    z-index: 2;
-    visibility: hidden;
-}
-#testdist {
+#coverage {
     color: white;
     font-family: "DSEG7 Classic";
     text-align: center;

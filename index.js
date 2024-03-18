@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    var canvas = document.getElementById("myCanvas");
-    var distanceSpot = document.getElementById("percentage");
-    var coverSpot = document.getElementById("distanceZone");
+    var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext("2d");
     var timer = new Date();
     var now = new Date();
@@ -97,14 +95,14 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
         secondsElapsed = (now - timer) / 1000;
-        $("#testResizableArray").sevenSeg({
+        $("#timer").sevenSeg({
             value: secondsElapsed.toFixed(1),
             digits: 6,
             slant: 0,
             decimalPoint: true,
         });
         if (calculateCoveragePercentage() <= 100 && nextLevelYes == false) {
-            document.getElementById('testdistcount').innerHTML = Math.round(calculateCoveragePercentage());
+            document.getElementById('coveragepercent').innerHTML = Math.round(calculateCoveragePercentage());
         }
         requestAnimationFrame(update);
     }

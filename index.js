@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Clear canvas
         if (!nextLevelYes) {
-            ctx.fillStyle = "rgb(205,240,255)";
+            ctx.fillStyle = `rgb(205,240,255)`;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
         // Draw bouncing ball
@@ -79,10 +79,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         var gradient = 255 * (1 - coPe / 100);
         if (!nextLevelYes) {
-            ctx.fillStyle = `rgba(${205 * (1 - coPe / 100)},${
+            ctx.fillStyle = `rgb(${205 * (1 - coPe / 100)},${
                 240 * (1 - coPe / 100)
             },${255 * (1 - coPe / 100)})`;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+            //ctx.globalAlpha = (1 - coPe / 100);
 
             drawBall(sun);
             drawBall(moon);
